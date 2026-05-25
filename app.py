@@ -1,0 +1,366 @@
+# app.py - Ajay Arjun Nikam Portfolio
+from flask import Flask, render_template_string
+
+app = Flask(__name__)
+
+HTML = r"""
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AJAY ARJUN NIKAM | DevOps Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root,[data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --text-2xl: clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem; --space-16: 4rem; --space-20: 5rem;
+      --color-bg: #f7f6f2; --color-surface: #f9f8f5; --color-surface-2: #fbfbf9; --color-surface-offset: #f3f0ec; --color-divider: #dcd9d5; --color-border: #d4d1ca;
+      --color-text: #28251d; --color-text-muted: #66645f; --color-text-faint: #9b9891; --color-primary: #01696f; --color-primary-hover: #0c4e54; --color-blue:#006494;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.06); --shadow-md: 0 8px 24px rgba(0,0,0,.08); --shadow-lg: 0 16px 44px rgba(0,0,0,.12);
+      --radius-sm: .375rem; --radius-md: .75rem; --radius-lg: 1rem; --radius-xl: 1.5rem; --radius-full: 9999px;
+      --font-display: 'Playfair Display', Georgia, serif; --font-body: 'Inter', Arial, sans-serif;
+    }
+    [data-theme="dark"] {
+      --color-bg: #171614; --color-surface: #1c1b19; --color-surface-2: #201f1d; --color-surface-offset: #262421; --color-divider: #262523; --color-border: #393836;
+      --color-text: #efede8; --color-text-muted: #bbb6ae; --color-text-faint: #807c75; --color-primary: #4f98a3; --color-primary-hover: #227f8b; --color-blue:#79a9d1;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.22); --shadow-md: 0 8px 24px rgba(0,0,0,.28); --shadow-lg: 0 16px 44px rgba(0,0,0,.4);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { min-height: 100vh; font-family: var(--font-body); font-size: var(--text-base); line-height: 1.6; color: var(--color-text); background:
+      radial-gradient(circle at top left, rgba(79,152,163,.13), transparent 28%),
+      radial-gradient(circle at right 10%, rgba(121,169,209,.08), transparent 24%), var(--color-bg); }
+    img,svg { display:block; max-width:100%; }
+    a { color: inherit; text-decoration: none; }
+    button,input,textarea { font: inherit; }
+    .container { width: min(1160px, calc(100% - 2rem)); margin: 0 auto; }
+    .skip-link { position:absolute; left:-9999px; top:auto; }
+    .skip-link:focus { left:1rem; top:1rem; background:var(--color-primary); color:#fff; padding:.75rem 1rem; border-radius:var(--radius-md); z-index:1000; }
+    .topbar { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(16px); background: color-mix(in srgb, var(--color-bg) 82%, transparent); border-bottom:1px solid var(--color-divider); }
+    .nav { display:flex; align-items:center; justify-content:space-between; min-height:76px; gap:var(--space-4); }
+    .brand { display:flex; align-items:center; gap:var(--space-3); font-weight:800; }
+    .brand-mark { width:42px; height:42px; border-radius:14px; display:grid; place-items:center; background:linear-gradient(135deg, var(--color-primary), var(--color-blue)); color:white; box-shadow:var(--shadow-md); font-size:.95rem; font-weight:800; }
+    .brand-copy strong { display:block; font-size:var(--text-sm); letter-spacing:.08em; text-transform:uppercase; }
+    .brand-copy span { display:block; font-size:var(--text-xs); color:var(--color-text-muted); }
+    .nav-links { display:flex; align-items:center; gap:var(--space-5); flex-wrap:wrap; }
+    .nav-links a { font-size:var(--text-sm); color:var(--color-text-muted); }
+    .nav-links a:hover { color:var(--color-text); }
+    .theme-toggle { width:46px; height:46px; border-radius:50%; border:1px solid var(--color-border); background:var(--color-surface); color:var(--color-text); cursor:pointer; }
+    .hero { padding: clamp(5rem, 8vw, 8rem) 0 clamp(3rem, 6vw, 6rem); }
+    .hero-grid { display:grid; grid-template-columns: 1.35fr .85fr; gap: var(--space-8); align-items:center; }
+    .eyebrow { display:inline-flex; align-items:center; gap:.55rem; padding:.45rem .9rem; border-radius:var(--radius-full); background:color-mix(in srgb, var(--color-primary) 12%, var(--color-surface)); border:1px solid color-mix(in srgb, var(--color-primary) 28%, var(--color-border)); color:var(--color-primary); font-size:var(--text-xs); font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:var(--space-4); }
+    h1 { font-family: var(--font-display); font-size: var(--text-2xl); line-height: 1.04; letter-spacing: -.03em; max-width: 12ch; }
+    .hero h1 span { color: var(--color-primary); }
+    .hero-summary { margin-top: var(--space-5); max-width: 66ch; color: var(--color-text-muted); }
+    .hero-actions { display:flex; gap:var(--space-3); flex-wrap:wrap; margin-top:var(--space-6); }
+    .btn { display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:.9rem 1.15rem; border-radius:var(--radius-full); border:1px solid transparent; transition:.2s ease; font-weight:700; }
+    .btn-primary { background:var(--color-primary); color:white; box-shadow:var(--shadow-md); }
+    .btn-primary:hover { background:var(--color-primary-hover); transform:translateY(-1px); }
+    .btn-secondary { background:transparent; border-color:var(--color-border); color:var(--color-text); }
+    .btn-secondary:hover { background:var(--color-surface); }
+    .hero-card { background: linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 88%, white 12%), var(--color-surface-offset)); border:1px solid var(--color-border); border-radius:var(--radius-xl); padding:var(--space-8); box-shadow:var(--shadow-lg); position:relative; overflow:hidden; }
+    .hero-card::after { content:''; position:absolute; inset:auto -40px -50px auto; width:180px; height:180px; border-radius:50%; background:color-mix(in srgb, var(--color-primary) 20%, transparent); filter:blur(20px); }
+    .profile-ring { width:96px; height:96px; border-radius:28px; background:linear-gradient(135deg, var(--color-primary), var(--color-blue)); display:grid; place-items:center; color:white; font-size:1.75rem; font-weight:800; box-shadow:var(--shadow-md); margin-bottom:var(--space-5); }
+    .hero-card h2 { font-size:var(--text-lg); margin-bottom:.3rem; }
+    .hero-card p { color:var(--color-text-muted); font-size:var(--text-sm); }
+    .info-list { list-style:none; margin-top:var(--space-5); display:grid; gap:var(--space-3); }
+    .info-list li { display:flex; align-items:flex-start; justify-content:space-between; gap:var(--space-4); padding-bottom:var(--space-3); border-bottom:1px solid var(--color-divider); }
+    .info-list li span:first-child { color:var(--color-text-muted); font-size:var(--text-sm); }
+    .info-list li span:last-child { text-align:right; font-weight:600; font-size:var(--text-sm); }
+    section { padding: clamp(3.5rem, 6vw, 5rem) 0; }
+    .section-head { display:flex; justify-content:space-between; gap:var(--space-4); align-items:end; margin-bottom:var(--space-8); }
+    .section-head h2 { font-family:var(--font-display); font-size:var(--text-xl); line-height:1.08; }
+    .section-head p { max-width:55ch; color:var(--color-text-muted); }
+    .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:var(--space-6); }
+    .card { background: color-mix(in srgb, var(--color-surface) 92%, transparent); border:1px solid var(--color-border); border-radius:var(--radius-xl); padding:var(--space-6); box-shadow:var(--shadow-sm); }
+    .card h3 { font-size:var(--text-lg); margin-bottom:var(--space-3); }
+    .muted { color:var(--color-text-muted); }
+    .skill-groups { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-5); }
+    .skill-group { padding:var(--space-5); border:1px solid var(--color-border); border-radius:var(--radius-lg); background:var(--color-surface-2); }
+    .skill-group h4 { margin-bottom:var(--space-3); font-size:var(--text-base); }
+    .tags { display:flex; flex-wrap:wrap; gap:.55rem; }
+    .tag { padding:.45rem .8rem; border-radius:var(--radius-full); background:color-mix(in srgb, var(--color-primary) 10%, var(--color-surface)); border:1px solid color-mix(in srgb, var(--color-primary) 18%, var(--color-border)); font-size:var(--text-xs); font-weight:600; }
+    .timeline { display:grid; gap:var(--space-5); }
+    .timeline-item { position:relative; padding:var(--space-6); padding-left:var(--space-8); border:1px solid var(--color-border); border-radius:var(--radius-xl); background:var(--color-surface); }
+    .timeline-item::before { content:''; position:absolute; left:1.4rem; top:1.8rem; width:12px; height:12px; border-radius:50%; background:var(--color-primary); box-shadow:0 0 0 6px color-mix(in srgb, var(--color-primary) 18%, transparent); }
+    .timeline-meta { display:flex; flex-wrap:wrap; gap:.8rem; align-items:center; color:var(--color-text-muted); font-size:var(--text-sm); margin-bottom:var(--space-3); }
+    .timeline-item ul { padding-left:1.1rem; display:grid; gap:.6rem; color:var(--color-text-muted); }
+    .projects { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-6); }
+    .project-card { height:100%; display:flex; flex-direction:column; gap:var(--space-4); background:linear-gradient(180deg, var(--color-surface), var(--color-surface-offset)); border:1px solid var(--color-border); border-radius:var(--radius-xl); padding:var(--space-6); box-shadow:var(--shadow-sm); }
+    .project-card h3 { font-size:var(--text-lg); line-height:1.2; }
+    .project-card ul { padding-left:1.1rem; color:var(--color-text-muted); display:grid; gap:.6rem; }
+    .project-tech { display:flex; flex-wrap:wrap; gap:.55rem; margin-top:auto; }
+    .education-grid,.contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-6); }
+    .contact-list { list-style:none; display:grid; gap:var(--space-4); }
+    .contact-list li { display:flex; gap:var(--space-3); align-items:flex-start; }
+    .contact-list strong { display:block; font-size:var(--text-sm); }
+    .contact-list span,.contact-list a { color:var(--color-text-muted); font-size:var(--text-sm); word-break:break-word; }
+    footer { padding:var(--space-8) 0 var(--space-10); color:var(--color-text-muted); font-size:var(--text-sm); }
+    .footer-box { border-top:1px solid var(--color-divider); padding-top:var(--space-6); display:flex; justify-content:space-between; gap:var(--space-4); flex-wrap:wrap; }
+    @media (max-width: 980px) {
+      .hero-grid,.grid-2,.projects,.education-grid,.contact-grid,.skill-groups { grid-template-columns:1fr; }
+      .nav { padding-block:.8rem; }
+      .nav-links { display:none; }
+      h1 { max-width:none; }
+    }
+    @media (max-width: 640px) {
+      .container { width:min(100% - 1rem, 1160px); }
+      .hero-card,.card,.timeline-item,.project-card,.skill-group { padding:var(--space-5); }
+      .section-head { align-items:start; flex-direction:column; }
+      .hero-actions { flex-direction:column; }
+      .btn { width:100%; }
+      .info-list li { flex-direction:column; }
+      .info-list li span:last-child { text-align:left; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <header class="topbar">
+    <div class="container nav">
+      <a href="#home" class="brand" aria-label="AJAY ARJUN NIKAM home">
+        <div class="brand-mark">AN</div>
+        <div class="brand-copy">
+          <strong>Ajay Nikam</strong>
+          <span>DevOps Engineer</span>
+        </div>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#about">About</a>
+        <a href="#skills">Skills</a>
+        <a href="#experience">Experience</a>
+        <a href="#projects">Projects</a>
+        <a href="#education">Education</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <button class="theme-toggle" data-theme-toggle aria-label="Switch theme">☾</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="home">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">Production-style DevOps experience</div>
+          <h1>Ajay Arjun Nikam builds <span>cloud infrastructure</span>, automation, and delivery pipelines.</h1>
+          <p class="hero-summary">DevOps Engineer with 6 months of hands-on experience at Hisan Labs Pvt Ltd, Pune, building and automating cloud infrastructure and CI/CD pipelines in a production-like environment. Reduced deployment time by up to 40% by designing automated workflows using GitHub Actions and Jenkins. Experienced in deploying containerized microservices on AWS using Docker, Kubernetes, and Terraform, with a focus on scalability, reliability, and monitoring.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#projects">View projects</a>
+            <a class="btn btn-secondary" href="mailto:ajaynikamcb@gmail.com">Email me</a>
+          </div>
+        </div>
+        <aside class="hero-card" aria-label="Profile summary">
+          <div class="profile-ring">AN</div>
+          <h2>DevOps Engineer</h2>
+          <p>Hisan Labs Pvt Ltd, Pune</p>
+          <ul class="info-list">
+            <li><span>Experience</span><span>6 Months</span></li>
+            <li><span>Phone</span><span>+91-9112831442</span></li>
+            <li><span>Email</span><span>ajaynikamcb@gmail.com</span></li>
+            <li><span>Location</span><span>Pune, India</span></li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow" style="margin-bottom:var(--space-3);">About</p>
+            <h2>Professional profile</h2>
+          </div>
+          <p>DevOps Engineer focused on cloud automation, CI/CD pipelines, container platforms, and reliable infrastructure delivery.</p>
+        </div>
+        <div class="grid-2">
+          <article class="card">
+            <h3>Professional snapshot</h3>
+            <p class="muted">DevOps Engineer with 6 months of hands-on experience at Hisan Labs Pvt Ltd, Pune, building and automating cloud infrastructure and CI/CD pipelines in a production-like environment. Reduced deployment time by up to 40% by designing automated workflows using GitHub Actions and Jenkins. Experienced in deploying containerized microservices on AWS using Docker, Kubernetes, and Terraform, with a focus on scalability, reliability, and monitoring.</p>
+          </article>
+          <article class="card">
+            <h3>Core strengths</h3>
+            <p class="muted">CI/CD implementation, containerized deployments, Kubernetes testing with Minikube, Terraform and CloudFormation-based infrastructure, monitoring with Datadog, Prometheus, and Grafana, plus automation using Python, Bash, and Ansible.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow" style="margin-bottom:var(--space-3);">Skills</p>
+            <h2>Technical stack</h2>
+          </div>
+          <p>Hands-on tools and platforms used across cloud infrastructure, automation, deployment, and monitoring workflows.</p>
+        </div>
+        <div class="skill-groups">
+          <div class="skill-group"><h4>Cloud platforms</h4><div class="tags"><span class="tag">AWS</span><span class="tag">GCP</span><span class="tag">Azure</span></div></div>
+          <div class="skill-group"><h4>Infrastructure as Code</h4><div class="tags"><span class="tag">Terraform</span><span class="tag">AWS CloudFormation</span></div></div>
+          <div class="skill-group"><h4>Containers & orchestration</h4><div class="tags"><span class="tag">Docker</span><span class="tag">Kubernetes</span><span class="tag">Amazon EKS</span><span class="tag">Minikube</span></div></div>
+          <div class="skill-group"><h4>CI/CD</h4><div class="tags"><span class="tag">Jenkins</span><span class="tag">GitHub Actions</span><span class="tag">GitLab CI</span><span class="tag">GitHub Webhooks</span></div></div>
+          <div class="skill-group"><h4>Monitoring & logging</h4><div class="tags"><span class="tag">AWS CloudWatch</span><span class="tag">Datadog</span><span class="tag">Prometheus</span><span class="tag">Grafana</span></div></div>
+          <div class="skill-group"><h4>Automation & systems</h4><div class="tags"><span class="tag">Ansible</span><span class="tag">Python</span><span class="tag">Shell Scripting</span><span class="tag">Bash</span><span class="tag">Linux</span><span class="tag">Git</span><span class="tag">GitHub</span><span class="tag">GitLab</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="experience">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow" style="margin-bottom:var(--space-3);">Experience</p>
+            <h2>DevOps Engineer Intern</h2>
+          </div>
+          <p>Hisan Labs Pvt Ltd, Pune · Oct 2025 - Mar 2026</p>
+        </div>
+        <div class="timeline">
+          <article class="timeline-item">
+            <div class="timeline-meta"><span>6 Months</span><span>•</span><span>Production-like environment</span></div>
+            <ul>
+              <li>Designed and implemented CI/CD pipelines using GitHub Actions and GitLab CI, reducing deployment time by 30 to 40 percent through automation.</li>
+              <li>Managed Jenkins pipelines for build, test, and deployment workflows across application delivery stages.</li>
+              <li>Containerized applications with Docker and improved consistency across environments.</li>
+              <li>Used Minikube for local Kubernetes cluster testing and YAML manifest creation.</li>
+              <li>Provisioned AWS infrastructure including EC2, S3, VPC, and IAM using Terraform and CloudFormation with reusable modules.</li>
+              <li>Automated server configuration and application setup using Ansible playbooks to reduce manual intervention.</li>
+              <li>Integrated Datadog for centralized logging and alerting, and used CloudWatch for debugging and system reliability.</li>
+              <li>Developed Python scripts for log parsing and health checks, saving more than 3 hours per week.</li>
+              <li>Reported server and application health issues using Prometheus and Grafana data, while collaborating with developers to improve deployment efficiency.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow" style="margin-bottom:var(--space-3);">Projects</p>
+            <h2>Selected DevOps projects</h2>
+          </div>
+          <p>Selected projects covering cloud deployment, CI/CD automation, Kubernetes operations, and infrastructure provisioning.</p>
+        </div>
+        <div class="projects">
+          <article class="project-card">
+            <div>
+              <h3>Microservices-Based Flight Booking System</h3>
+              <ul>
+                <li>Deployed a microservices booking platform on AWS with frontend on S3, backend on EKS, and database on RDS using Jenkins and Terraform.</li>
+                <li>Wrote and applied Kubernetes YAML manifests and tracked pod health on EKS using kubectl.</li>
+                <li>Built Jenkins pipelines with GitHub webhook integration for Dev and Test environments.</li>
+                <li>Created Terraform modules for S3, VPC, and Security Group provisioning and used AWS CLI to deploy AngularJS frontend builds to S3.</li>
+              </ul>
+            </div>
+            <div class="project-tech"><span class="tag">AWS S3</span><span class="tag">EKS</span><span class="tag">RDS</span><span class="tag">Docker</span><span class="tag">Kubernetes</span><span class="tag">Jenkins</span><span class="tag">Terraform</span><span class="tag">GitHub</span><span class="tag">AWS CLI</span></div>
+          </article>
+          <article class="project-card">
+            <div>
+              <h3>3-Tier Web Application Deployment</h3>
+              <ul>
+                <li>Built a 3-tier web application with frontend, backend, and database using AngularJS, REST APIs, and RDS.</li>
+                <li>Containerized the application with Docker and deployed it on Kubernetes using EKS.</li>
+                <li>Automated infrastructure setup using Terraform for VPC, S3, and security groups.</li>
+                <li>Created Jenkins pipelines with GitHub integration to automate build, test, and deployment, then monitored health using kubectl and AWS CLI.</li>
+              </ul>
+            </div>
+            <div class="project-tech"><span class="tag">Docker</span><span class="tag">Kubernetes</span><span class="tag">EKS</span><span class="tag">RDS</span><span class="tag">Terraform</span><span class="tag">Jenkins</span><span class="tag">GitHub</span><span class="tag">AWS CLI</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="education">
+      <div class="container education-grid">
+        <article class="card">
+          <div class="section-head" style="margin-bottom:var(--space-5);">
+            <div>
+              <p class="eyebrow" style="margin-bottom:var(--space-3);">Education</p>
+              <h2>B.Tech in Computer Science and Engineering</h2>
+            </div>
+          </div>
+          <p><strong>G. H. Raisoni College of Engineering and Management - An Autonomous Institute (NAAC “A”)</strong></p>
+          <p class="muted" style="margin-top:var(--space-2);">2021 - 2025</p>
+        </article>
+        <article class="card">
+          <div class="section-head" style="margin-bottom:var(--space-5);">
+            <div>
+              <p class="eyebrow" style="margin-bottom:var(--space-3);">Highlights</p>
+              <h2>Career focus</h2>
+            </div>
+          </div>
+          <p class="muted">Focused on CI/CD implementation, Docker and Kubernetes-based deployments, infrastructure as code, automation with Python and Ansible, and observability across cloud environments.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="container contact-grid">
+        <article class="card">
+          <div class="section-head" style="margin-bottom:var(--space-5);">
+            <div>
+              <p class="eyebrow" style="margin-bottom:var(--space-3);">Contact</p>
+              <h2>Professional links</h2>
+            </div>
+          </div>
+          <ul class="contact-list">
+            <li><div><strong>Phone</strong><span>+91-9112831442</span></div></li>
+            <li><div><strong>Email</strong><a href="mailto:ajaynikamcb@gmail.com">ajaynikamcb@gmail.com</a></div></li>
+            <li><div><strong>Location</strong><span>Pune, India</span></div></li>
+            <li><div><strong>LinkedIn</strong><a href="https://linkedin.com/in/ajay-nikam-devops" target="_blank" rel="noopener noreferrer">https://linkedin.com/in/ajay-nikam-devops</a></div></li>
+            <li><div><strong>GitHub</strong><a href="https://github.com/Ajay-Nikam-DevOps" target="_blank" rel="noopener noreferrer">https://github.com/Ajay-Nikam-DevOps</a></div></li>
+          </ul>
+        </article>
+        <article class="card">
+          <div class="section-head" style="margin-bottom:var(--space-5);">
+            <div>
+              <p class="eyebrow" style="margin-bottom:var(--space-3);">Connect</p>
+              <h2>Open to opportunities</h2>
+            </div>
+          </div>
+          <p class="muted">Available for DevOps, Cloud, and Platform Engineering opportunities with strong interest in automation, scalable infrastructure, and production support.</p>
+          <div class="hero-actions" style="margin-top:var(--space-5);">
+            <a class="btn btn-primary" href="#home">Back to top</a>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-box">
+      <p>© 2026 Ajay Arjun Nikam · DevOps Engineer</p>
+      <p>Portfolio website</p>
+    </div>
+  </footer>
+
+  <script>
+    (function(){
+      const t=document.querySelector('[data-theme-toggle]');
+      const r=document.documentElement;
+      let d=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+      r.setAttribute('data-theme', d);
+      const paint=()=>{ t.textContent = d === 'dark' ? '☀' : '☾'; t.setAttribute('aria-label', 'Switch to ' + (d === 'dark' ? 'light' : 'dark') + ' mode'); };
+      paint();
+      t.addEventListener('click', ()=>{ d = d === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', d); paint(); });
+    })();
+  </script>
+</body>
+</html>
+"""
+
+@app.route('/')
+def home():
+    return render_template_string(HTML)
+
+if __name__ == '__main__':
+    app.run(debug=True)
